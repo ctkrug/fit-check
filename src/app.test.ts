@@ -341,6 +341,37 @@ describe("createApp — breakdown and URL", () => {
     expect(root.innerHTML).toBe("");
   });
 
+  it("collapses an expanded breakdown on a second click", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
+    const expand = () => root.querySelector<HTMLButtonElement>('[data-expand="Q4"]')!;
+    expand().click();
+    expect(root.querySelector(".breakdown")).not.toBeNull();
+    expand().click();
+    expect(root.querySelector(".breakdown")).toBeNull();
+  });
+
+  it("keeps a bar expanded across a format toggle and reflects the new bits", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
+    root.querySelector<HTMLButtonElement>('[data-expand="Q4"]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-format="AWQ"]')!.click();
+    const breakdown = root.querySelector(".breakdown");
+    expect(breakdown).not.toBeNull();
+    expect(breakdown?.textContent).toContain("4.16 bits");
+  });
+
+  it("shares a custom GPU by round-tripping VRAM and bandwidth in the link", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const held = ((_fn: () => void) => 0 as unknown as ReturnType<typeof setTimeout>) as typeof setTimeout;
+    const root = mount({ initialSearch: "?vram=48&bw=800&params=8B", setTimeoutImpl: held });
+    root.querySelector<HTMLButtonElement>("#share")!.click();
+    await flush();
+    const link = writeText.mock.calls[0]![0] as string;
+    expect(link).toContain("vram=48");
+    expect(link).toContain("bw=800");
+    expect(link).not.toContain("gpu=");
+  });
+
   it("hydrates GPU, model, and format from the URL", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090&params=7B&fmt=AWQ" });
     expect(root.querySelector<HTMLInputElement>("#gpu-input")!.value).toBe("RTX 4090");
