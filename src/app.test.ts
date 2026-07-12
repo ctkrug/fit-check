@@ -90,6 +90,24 @@ describe("createApp — live readout", () => {
     expect(fp16.querySelector(".bar-speed")?.textContent).toBe("won't fit");
   });
 
+  it("handles an absurdly large model without crashing", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090" });
+    type(root.querySelector("#model-input")!, "99999B");
+    const bars = Array.from(root.querySelectorAll(".bar"));
+    expect(bars).toHaveLength(4);
+    // Everything is red (won't fit) and no bar overflows its track.
+    expect(bars.every((b) => b.classList.contains("bar--red"))).toBe(true);
+    for (const fill of root.querySelectorAll<HTMLElement>(".bar-fill")) {
+      expect(parseFloat(fill.style.width)).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it("degrades to the empty state for an unknown GPU name in the URL", () => {
+    const root = mount({ initialSearch: "?gpu=Nonexistent+9000&params=8B" });
+    expect(root.querySelector(".bar")).toBeNull();
+    expect(root.querySelector(".empty")?.textContent).toContain("Pick a GPU");
+  });
+
   it("changes tokens/sec when GPU bandwidth changes (wow-moment guarantee)", () => {
     const fast = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
     const fastSpeed = fast.querySelector(".bar-speed")!.textContent;
