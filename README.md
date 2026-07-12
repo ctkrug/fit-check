@@ -64,6 +64,7 @@ Requires Node 20+ (see `.nvmrc`).
 npm install
 npm run dev        # local dev server
 npm test           # run the unit test suite
+npm run coverage   # run tests with a V8 coverage report
 npm run typecheck  # tsc --noEmit
 npm run build      # type-check + production build into dist/
 ```
