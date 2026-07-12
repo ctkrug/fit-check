@@ -511,7 +511,8 @@ function template(): string {
         <label for="gpu-input">GPU</label>
         <div class="combo">
           <input id="gpu-input" type="text" role="combobox" aria-expanded="false"
-                 aria-controls="gpu-list" autocomplete="off" placeholder="Search GPUs…" />
+                 aria-controls="gpu-list" aria-autocomplete="list" autocomplete="off"
+                 placeholder="Search GPUs…" />
           <ul id="gpu-list" class="combo-list" role="listbox" hidden></ul>
         </div>
         <button id="custom-toggle" type="button" class="ghost" aria-pressed="false">Custom</button>
