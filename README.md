@@ -1,5 +1,7 @@
 # Fit Check
 
+[![CI](https://github.com/ctkrug/fit-check/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/fit-check/actions/workflows/ci.yml)
+
 Type a GPU, type a Hugging Face model name, get an instant answer: **will it run, and how
 fast?** Not just "fits in memory" — a per-quantization speed estimate (tokens/sec) grounded in
 real memory-bandwidth math, so you know whether it's usable or just technically loadable.
