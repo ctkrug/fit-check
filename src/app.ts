@@ -100,17 +100,56 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
   typeWordmark(wordmark, "FIT CHECK", { reducedMotion: options.reducedMotion });
 
   // --- GPU combobox ------------------------------------------------------
+  // A WAI-ARIA-style combobox: the input owns a listbox that opens on focus /
+  // typing and is fully drivable by keyboard (Arrow/Enter/Escape), so a
+  // pointer is never required to pick a GPU.
+  let gpuMatches: Gpu[] = [];
+  let activeIndex = -1;
+
+  function setListOpen(open: boolean): void {
+    gpuList.hidden = !open;
+    gpuInput.setAttribute("aria-expanded", String(open));
+    if (!open) {
+      activeIndex = -1;
+      gpuInput.removeAttribute("aria-activedescendant");
+    }
+  }
+
   function renderGpuList(query: string): void {
-    const matches = searchGpus(query).slice(0, 8);
-    gpuList.innerHTML = matches
+    gpuMatches = searchGpus(query).slice(0, 8);
+    if (activeIndex >= gpuMatches.length) activeIndex = gpuMatches.length - 1;
+    gpuList.innerHTML = gpuMatches
       .map(
-        (g) =>
-          `<li role="option" data-gpu="${escapeAttr(g.name)}" tabindex="-1">` +
+        (g, i) =>
+          `<li id="gpu-opt-${i}" role="option" data-gpu="${escapeAttr(g.name)}" ` +
+          `aria-selected="${i === activeIndex}" tabindex="-1">` +
           `<span>${escapeHtml(g.name)}</span>` +
           `<span class="muted">${g.vramGB}GB · ${g.bandwidthGBs}GB/s</span></li>`,
       )
       .join("");
-    gpuList.hidden = matches.length === 0;
+    setListOpen(gpuMatches.length > 0);
+    highlightActive();
+  }
+
+  function highlightActive(): void {
+    const items = Array.from(gpuList.querySelectorAll<HTMLLIElement>("li[data-gpu]"));
+    items.forEach((li, i) => {
+      const on = i === activeIndex;
+      li.classList.toggle("is-active", on);
+      li.setAttribute("aria-selected", String(on));
+    });
+    if (activeIndex >= 0) {
+      gpuInput.setAttribute("aria-activedescendant", `gpu-opt-${activeIndex}`);
+    } else {
+      gpuInput.removeAttribute("aria-activedescendant");
+    }
+  }
+
+  function moveActive(delta: number): void {
+    if (gpuList.hidden) renderGpuList(gpuInput.value);
+    if (gpuMatches.length === 0) return;
+    activeIndex = (activeIndex + delta + gpuMatches.length) % gpuMatches.length;
+    highlightActive();
   }
 
   function selectGpu(name: string): void {
@@ -121,7 +160,7 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
     state.vramGB = gpu.vramGB;
     state.bandwidthGBs = gpu.bandwidthGBs;
     gpuInput.value = gpu.name;
-    gpuList.hidden = true;
+    setListOpen(false);
     customFields.hidden = true;
     customToggle.setAttribute("aria-pressed", "false");
     render();
@@ -131,7 +170,33 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
   gpuInput.addEventListener("input", () => renderGpuList(gpuInput.value));
   gpuInput.addEventListener("blur", () => {
     // Delay so a click on a list item registers before hiding.
-    setTimeoutImpl(() => (gpuList.hidden = true), 150);
+    setTimeoutImpl(() => setListOpen(false), 150);
+  });
+  gpuInput.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        moveActive(1);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        moveActive(-1);
+        break;
+      case "Enter": {
+        const active = gpuList.hidden ? undefined : gpuMatches[activeIndex];
+        if (active) {
+          e.preventDefault();
+          selectGpu(active.name);
+        }
+        break;
+      }
+      case "Escape":
+        if (!gpuList.hidden) {
+          e.preventDefault();
+          setListOpen(false);
+        }
+        break;
+    }
   });
   gpuList.addEventListener("mousedown", (e) => {
     const li = (e.target as HTMLElement).closest("li[data-gpu]");

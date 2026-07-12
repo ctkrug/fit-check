@@ -230,9 +230,13 @@ input:focus-visible {
   transition: background 120ms var(--ease);
 }
 .combo-list li:hover,
-.combo-list li:focus-visible {
+.combo-list li:focus-visible,
+.combo-list li.is-active {
   background: rgba(79, 214, 255, 0.12);
   outline: none;
+}
+.combo-list li.is-active {
+  box-shadow: inset 2px 0 0 var(--accent);
 }
 .muted {
   color: var(--text-muted);

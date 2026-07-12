@@ -95,6 +95,43 @@ describe("createApp — live readout", () => {
   });
 });
 
+describe("createApp — GPU combobox keyboard", () => {
+  function keydown(el: HTMLElement, key: string): void {
+    el.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }));
+  }
+
+  it("selects a GPU with ArrowDown + Enter (no mouse)", () => {
+    const root = mount({ initialSearch: "?params=8B" });
+    const gpuInput = root.querySelector<HTMLInputElement>("#gpu-input")!;
+    gpuInput.value = "4090";
+    gpuInput.dispatchEvent(new Event("input"));
+    keydown(gpuInput, "ArrowDown");
+    keydown(gpuInput, "Enter");
+    expect(gpuInput.value).toBe("RTX 4090");
+    expect(root.querySelectorAll(".bar")).toHaveLength(4);
+  });
+
+  it("tracks listbox visibility in aria-expanded", () => {
+    const root = mount({ initialSearch: "?params=8B" });
+    const gpuInput = root.querySelector<HTMLInputElement>("#gpu-input")!;
+    expect(gpuInput.getAttribute("aria-expanded")).toBe("false");
+    gpuInput.dispatchEvent(new Event("focus"));
+    expect(gpuInput.getAttribute("aria-expanded")).toBe("true");
+    keydown(gpuInput, "Escape");
+    expect(gpuInput.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("wraps ArrowUp from the top to the last option", () => {
+    const root = mount({ initialSearch: "?params=8B" });
+    const gpuInput = root.querySelector<HTMLInputElement>("#gpu-input")!;
+    gpuInput.dispatchEvent(new Event("focus"));
+    keydown(gpuInput, "ArrowUp");
+    const active = root.querySelector("#gpu-list li.is-active");
+    expect(active).not.toBeNull();
+    expect(gpuInput.getAttribute("aria-activedescendant")).toBeTruthy();
+  });
+});
+
 describe("createApp — model input handling", () => {
   it("shows an error state for a malformed size", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090" });
