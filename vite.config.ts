@@ -5,7 +5,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   base: "./",
   build: {
-    outDir: "dist",
+    // Emit the self-contained servable site (app + below-fold SEO copy).
+    outDir: "site",
+    emptyOutDir: true,
   },
   test: {
     environment: "node",
