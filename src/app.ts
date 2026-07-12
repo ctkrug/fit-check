@@ -38,15 +38,19 @@ interface State {
   paramCount: number | null;
   format: WeightFormat;
   lookupStatus: LookupStatus;
-  lookupError: LookupError | null;
+  lookupError: StatusError | null;
   expanded: string | null;
 }
 
-const LOOKUP_MESSAGES: Record<LookupError, string> = {
+/** Model-input errors: HF lookup failures plus a locally-detected bad size. */
+type StatusError = LookupError | "invalid-size";
+
+const LOOKUP_MESSAGES: Record<StatusError, string> = {
   "invalid-repo": "Enter a valid repo ID like meta-llama/Llama-3.1-8B",
   "not-found": "Model not found on Hugging Face",
   "no-param-count": "Couldn't read a parameter count from this model's config",
   network: "Network error fetching the model config — check your connection",
+  "invalid-size": "Enter a size like 7B or 125M, or an owner/name repo ID",
 };
 
 const VERDICT_LABEL: Record<string, string> = {
@@ -182,7 +186,7 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
       const parsed = parseParamCount(state.modelInput);
       state.paramCount = parsed;
       state.lookupStatus = parsed === null ? "error" : "ok";
-      state.lookupError = parsed === null ? "no-param-count" : null;
+      state.lookupError = parsed === null ? "invalid-size" : null;
       render();
       return;
     }

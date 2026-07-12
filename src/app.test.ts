@@ -103,6 +103,15 @@ describe("createApp — model input handling", () => {
     expect(root.querySelector(".bar")).toBeNull();
   });
 
+  it("explains a bad manual size without mentioning a config", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090" });
+    type(root.querySelector("#model-input")!, "banana");
+    const msg = root.querySelector("#model-status")?.textContent ?? "";
+    // A bare size has no config.json — the message must guide toward "7B".
+    expect(msg).not.toContain("config");
+    expect(msg).toContain("7B");
+  });
+
   it("resolves a HF repo ID via the injected fetch", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
