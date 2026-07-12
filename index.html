@@ -4,11 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1628" />
-    <title>Fit Check — will your GPU run it, and how fast?</title>
+    <title>Fit Check — can I run this LLM on my GPU?</title>
     <meta
       name="description"
-      content="Enter a GPU and a Hugging Face model to get an instant fit + speed estimate per quantization level."
+      content="An LLM VRAM calculator that tells you if a Hugging Face model runs on your GPU, and the tokens per second you'll actually get, from real quantization math."
     />
+    <meta property="og:title" content="Fit Check — can I run this LLM on my GPU?" />
+    <meta
+      property="og:description"
+      content="An LLM VRAM calculator: enter a GPU and a Hugging Face model, get an instant fit and tokens-per-second estimate per quantization level."
+    />
+    <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
@@ -18,6 +24,88 @@
       >Fit Check computes quantization fit and speed in your browser and needs JavaScript
       enabled to run.</noscript
     >
+
+    <section class="prose" aria-label="About Fit Check">
+      <h2>Can I run this LLM on my GPU?</h2>
+      <p>
+        Fit Check answers the question every local LLM setup starts with: will this model load
+        on your card, and will it run fast enough to use? Type your GPU (or its VRAM and memory
+        bandwidth) and a Hugging Face model name. You get four bars, one per quantization level,
+        each showing whether the model fits and an estimated tokens per second, computed live in
+        your browser with no login and no download.
+      </p>
+
+      <h3>How the estimate works</h3>
+      <p>
+        Two numbers decide it. First, footprint: a model's size in memory is its parameter count
+        times the effective bits per parameter of the quantization format. Q4 stores weights at
+        roughly 4.85 bits each, FP16 at 16. Multiply by the parameter count, divide by eight, and
+        you have the bytes the weights occupy. Second, speed: generating each token streams every
+        weight through the GPU's memory bus once, so tokens per second is close to memory
+        bandwidth divided by model size, scaled down by a real-world efficiency factor. A model
+        that fits in VRAM but is bandwidth-starved shows up yellow or red, not green.
+      </p>
+
+      <h3>What model can I run locally?</h3>
+      <p>
+        That depends on your VRAM and how much speed you need. A 24 GB card like an RTX 4090
+        comfortably runs an 8B model at Q4 or Q5 with room to spare, handles a 34B at Q4, and
+        starts to struggle past 70B even at Q4. An 8 GB card is happy with 7B and smaller. Fit
+        Check does this arithmetic for any model on Hugging Face, including ones released today,
+        because it reads the parameter count from the model's config instead of a hand-maintained
+        table.
+      </p>
+
+      <h3>FAQ</h3>
+      <dl class="faq">
+        <dt>Can I run Llama on my GPU?</dt>
+        <dd>
+          Enter your GPU and a Llama repo ID like <code>meta-llama/Llama-3.1-8B</code>. Fit Check
+          reads the parameter count and shows, per quantization level, whether it fits in your
+          VRAM and how many tokens per second to expect. An 8B Llama runs well on 12 GB and up; a
+          70B needs a 24 GB card at Q4 and still runs slowly.
+        </dd>
+
+        <dt>How much VRAM do I need to run an LLM?</dt>
+        <dd>
+          Roughly the model's parameter count times the bits per weight, divided by eight, plus
+          headroom for the runtime and KV cache. A 7B model at Q4 needs about 4 GB of weights, so
+          6 to 8 GB of VRAM in practice. Fit Check reserves a 10% margin, so a model that only
+          technically fits is not marked green.
+        </dd>
+
+        <dt>What model can I run locally?</dt>
+        <dd>
+          Pick the largest model whose Q4 or Q5 bar comes up green for your card. Green means it
+          fits with headroom and runs fast enough for interactive chat. Yellow fits but will feel
+          slow. Red will not load, or it crawls.
+        </dd>
+
+        <dt>What do Q4, Q5, Q8, and FP16 mean?</dt>
+        <dd>
+          They are quantization levels: how many bits each weight is stored in. Fewer bits mean a
+          smaller, faster model with a small quality trade-off. Q4 and Q5 are the usual sweet spot
+          for local use; FP16 is full precision and the largest.
+        </dd>
+
+        <dt>Does a model fitting in VRAM mean it will be fast?</dt>
+        <dd>
+          No, and that is the point of Fit Check. Token generation is limited by memory bandwidth,
+          so a large model can fit in VRAM and still produce only a few tokens per second. Fit
+          Check reports the speed, not just the fit.
+        </dd>
+      </dl>
+    </section>
+
+    <footer class="site-footer">
+      <a class="footer-cta" href="https://github.com/ctkrug/fit-check" target="_blank" rel="noopener"
+        >View on GitHub ↗</a
+      >
+      <a class="footer-portfolio" href="https://apps.charliekrug.com" target="_blank" rel="noopener"
+        >More by Charlie Krug → apps.charliekrug.com</a
+      >
+    </footer>
+
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

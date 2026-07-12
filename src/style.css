@@ -545,6 +545,101 @@ input:focus-visible {
   color: var(--accent);
 }
 
+/* --- Below-the-fold prose + FAQ (SEO, styled to the blueprint) --------- */
+.prose {
+  width: min(760px, 100%);
+  margin: 8px auto 0;
+  padding: 0 clamp(16px, 4vw, 48px) 24px;
+  color: var(--text);
+}
+.prose h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
+}
+.prose h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  margin: 28px 0 8px;
+}
+.prose p {
+  max-width: 68ch;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+}
+.faq {
+  margin: 8px 0 0;
+}
+.faq dt {
+  font-weight: 500;
+  color: var(--text);
+  margin-top: 18px;
+}
+.faq dd {
+  margin: 6px 0 0;
+  max-width: 68ch;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 1px 5px;
+  background: var(--surface-2);
+  border-radius: var(--r-input);
+  color: var(--accent);
+}
+
+/* --- Site footer ------------------------------------------------------- */
+.site-footer {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 24px clamp(16px, 4vw, 48px) 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+}
+.footer-cta {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-input);
+  transition:
+    background 150ms var(--ease),
+    box-shadow 150ms var(--ease);
+}
+.footer-cta:hover {
+  background: rgba(79, 214, 255, 0.12);
+}
+.footer-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 214, 255, 0.2);
+}
+.footer-portfolio {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 150ms var(--ease);
+}
+.footer-portfolio:hover,
+.footer-portfolio:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
 /* --- Responsive -------------------------------------------------------- */
 @media (max-width: 780px) {
   .controls {
