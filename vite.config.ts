@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 // Relative base so the built site works when served from any subpath
 // (e.g. apps.charliekrug.com/fit-check), not just domain root.
