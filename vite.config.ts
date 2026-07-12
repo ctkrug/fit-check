@@ -14,6 +14,14 @@ export default defineConfig({
       include: ["src/**/*.ts"],
       exclude: ["src/**/*.test.ts", "src/main.ts"],
       reporter: ["text", "html"],
+      // Guard the QA bar: fail the run if coverage regresses below these.
+      // Set with margin under the current numbers so they catch real drops.
+      thresholds: {
+        lines: 92,
+        statements: 92,
+        branches: 85,
+        functions: 85,
+      },
     },
   },
 });
