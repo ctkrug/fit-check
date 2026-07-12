@@ -52,9 +52,22 @@ TypeScript, built as a static, self-contained site (no backend, no server-side s
 be published to a static host as-is. Vite for the dev/build toolchain, Vitest for unit tests
 covering the quantization and bandwidth math.
 
+## Development
+
+Requires Node 22+ (see `.nvmrc`).
+
+```
+npm install
+npm run dev        # local dev server
+npm test           # run the unit test suite
+npm run typecheck  # tsc --noEmit
+npm run build      # type-check + production build into dist/
+```
+
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design rationale and
+Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design rationale,
+[`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction, and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
 
 ## License
