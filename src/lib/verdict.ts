@@ -54,12 +54,3 @@ export function classifyFit(
   }
   return { verdict: "green", reason: "comfortable", fits: true };
 }
-
-/** Colour-only verdict, for callers that just need the bar hue. */
-export function classifyVerdict(
-  modelBytes: number,
-  vramBytes: number,
-  tokensPerSecond: number,
-): Verdict {
-  return classifyFit(modelBytes, vramBytes, tokensPerSecond).verdict;
-}

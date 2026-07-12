@@ -1,29 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyFit, classifyVerdict } from "./verdict";
-
-describe("classifyVerdict", () => {
-  it("is red when the model doesn't fit in VRAM", () => {
-    expect(classifyVerdict(30e9, 24e9, 40)).toBe("red");
-  });
-
-  it("is red when the model fits but is too slow", () => {
-    expect(classifyVerdict(10e9, 24e9, 2)).toBe("red");
-  });
-
-  it("is yellow when the model fits and runs at a usable-but-slow speed", () => {
-    expect(classifyVerdict(10e9, 24e9, 10)).toBe("yellow");
-  });
-
-  it("is green when the model fits and runs comfortably fast", () => {
-    expect(classifyVerdict(10e9, 24e9, 40)).toBe("green");
-  });
-
-  it("reserves VRAM headroom so a model near the ceiling won't fit", () => {
-    // 23 GB weights technically < 24 GB VRAM, but not under the 90% margin.
-    expect(classifyVerdict(23e9, 24e9, 40)).toBe("red");
-    expect(classifyVerdict(21e9, 24e9, 40)).toBe("green");
-  });
-});
+import { classifyFit } from "./verdict";
 
 describe("classifyFit", () => {
   it("labels a too-large model 'wont-fit' regardless of speed", () => {
@@ -45,6 +21,12 @@ describe("classifyFit", () => {
 
   it("treats a zero-byte (no model) input as not fitting", () => {
     expect(classifyFit(0, 24e9, 0).fits).toBe(false);
+  });
+
+  it("reserves VRAM headroom so a model near the ceiling won't fit", () => {
+    // 23 GB weights technically < 24 GB VRAM, but not under the 90% margin.
+    expect(classifyFit(23e9, 24e9, 40).fits).toBe(false);
+    expect(classifyFit(21e9, 24e9, 40).verdict).toBe("green");
   });
 
   it("puts the threshold speeds on the faster side (>= is inclusive)", () => {
