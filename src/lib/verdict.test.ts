@@ -46,4 +46,14 @@ describe("classifyFit", () => {
   it("treats a zero-byte (no model) input as not fitting", () => {
     expect(classifyFit(0, 24e9, 0).fits).toBe(false);
   });
+
+  it("puts the threshold speeds on the faster side (>= is inclusive)", () => {
+    // Exactly SLOW_THRESHOLD (5) is 'usable', not 'too-slow'.
+    expect(classifyFit(10e9, 24e9, 5).reason).toBe("usable");
+    // Exactly COMFORTABLE_THRESHOLD (20) is 'comfortable', not 'usable'.
+    expect(classifyFit(10e9, 24e9, 20).reason).toBe("comfortable");
+    // Just below each threshold falls to the slower band.
+    expect(classifyFit(10e9, 24e9, 4.99).reason).toBe("too-slow");
+    expect(classifyFit(10e9, 24e9, 19.99).reason).toBe("usable");
+  });
 });
