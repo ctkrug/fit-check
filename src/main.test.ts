@@ -6,9 +6,13 @@ describe("entrypoint", () => {
     document.body.innerHTML = '<div id="app"></div>';
   });
 
-  it("renders into #app without throwing", async () => {
+  it("mounts the app UI into #app without throwing", async () => {
     await import("./main");
     const app = document.querySelector("#app");
-    expect(app?.textContent).toContain("Fit Check");
+    // Stable structure (the animated wordmark may still be typing).
+    expect(app?.querySelector(".tagline")?.textContent).toContain("GPU");
+    expect(app?.querySelector("#gpu-input")).not.toBeNull();
+    expect(app?.querySelector("#model-input")).not.toBeNull();
+    expect(app?.querySelector("#readout")).not.toBeNull();
   });
 });
