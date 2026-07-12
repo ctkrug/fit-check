@@ -176,6 +176,93 @@ describe("createApp — model input handling", () => {
   });
 });
 
+describe("createApp — custom GPU + share", () => {
+  it("computes against custom VRAM/bandwidth entered by hand", () => {
+    const root = mount({ initialSearch: "?params=8B" });
+    root.querySelector<HTMLButtonElement>("#custom-toggle")!.click();
+    const vram = root.querySelector<HTMLInputElement>("#vram")!;
+    const bw = root.querySelector<HTMLInputElement>("#bw")!;
+    type(vram, "48");
+    type(bw, "800");
+    expect(root.querySelectorAll(".bar")).toHaveLength(4);
+    expect(root.querySelector(".readout-caption")?.textContent).toContain("Custom (48GB · 800GB/s)");
+  });
+
+  it("falls back to the empty state when custom fields are cleared", () => {
+    const root = mount({ initialSearch: "?params=8B" });
+    root.querySelector<HTMLButtonElement>("#custom-toggle")!.click();
+    type(root.querySelector("#vram")!, "");
+    expect(root.querySelector(".bar")).toBeNull();
+    expect(root.querySelector(".empty")?.textContent).toContain("Pick a GPU");
+  });
+
+  it("hydrates a custom GPU from the URL", () => {
+    const root = mount({ initialSearch: "?vram=48&bw=800&params=8B" });
+    expect(root.querySelector<HTMLInputElement>("#vram")!.value).toBe("48");
+    expect(root.querySelectorAll(".bar")).toHaveLength(4);
+  });
+
+  it("copies a shareable link and confirms on the button", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const held = ((_fn: () => void) => 0 as unknown as ReturnType<typeof setTimeout>) as typeof setTimeout;
+    const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B", setTimeoutImpl: held });
+    const share = root.querySelector<HTMLButtonElement>("#share")!;
+    share.click();
+    await flush();
+    expect(writeText).toHaveBeenCalledOnce();
+    expect(writeText.mock.calls[0]![0]).toContain("gpu=RTX+4090");
+    expect(share.textContent).toBe("Copied ✓");
+  });
+
+  it("reports a clipboard failure on the button", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const held = ((_fn: () => void) => 0 as unknown as ReturnType<typeof setTimeout>) as typeof setTimeout;
+    const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B", setTimeoutImpl: held });
+    const share = root.querySelector<HTMLButtonElement>("#share")!;
+    share.click();
+    await flush();
+    expect(share.textContent).toBe("Copy failed");
+  });
+});
+
+describe("createApp — async lookup states", () => {
+  it("shows a loading state while a repo lookup is in flight", () => {
+    const fetchImpl = vi.fn().mockReturnValue(new Promise<Response>(() => {}));
+    const root = mount({ initialSearch: "?gpu=RTX+4090", fetchImpl });
+    type(root.querySelector("#model-input")!, "meta-llama/Llama-3.1-8B");
+    expect(root.querySelector("#model-status")?.getAttribute("data-state")).toBe("loading");
+    expect(root.querySelector("#model-status")?.textContent).toContain("Fetching");
+  });
+
+  it("surfaces a network error from a thrown fetch", async () => {
+    const fetchImpl = vi.fn().mockRejectedValue(new Error("offline"));
+    const root = mount({ initialSearch: "?gpu=RTX+4090", fetchImpl });
+    type(root.querySelector("#model-input")!, "meta-llama/Llama-3.1-8B");
+    await flush();
+    expect(root.querySelector("#model-status")?.textContent).toContain("Network error");
+    expect(root.querySelector(".bar")).toBeNull();
+  });
+
+  it("ignores a stale lookup superseded by newer input", async () => {
+    let resolveFirst: (r: Response) => void = () => {};
+    const first = new Promise<Response>((r) => (resolveFirst = r));
+    const fetchImpl = vi
+      .fn()
+      .mockReturnValueOnce(first)
+      .mockResolvedValue({ ok: false, status: 404, json: async () => ({}) } as Response);
+    const root = mount({ initialSearch: "?gpu=RTX+4090", fetchImpl });
+    type(root.querySelector("#model-input")!, "owner/first");
+    type(root.querySelector("#model-input")!, "owner/second");
+    await flush();
+    // Late-resolve the superseded first request: it must not overwrite state.
+    resolveFirst({ ok: true, status: 200, json: async () => LLAMA3_CONFIG } as Response);
+    await flush();
+    expect(root.querySelector("#model-status")?.textContent).toContain("not found");
+  });
+});
+
 describe("createApp — breakdown and URL", () => {
   it("expands a bar's calculation breakdown on click", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
