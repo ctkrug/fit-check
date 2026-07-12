@@ -27,8 +27,8 @@ describe("computeReadout", () => {
   });
 
   it("changes throughput when GPU bandwidth changes (wow-moment guarantee)", () => {
-    const fast = computeReadout({ vramGB: 24, bandwidthGBs: 1008 }, 8e9)[0];
-    const slow = computeReadout({ vramGB: 24, bandwidthGBs: 360 }, 8e9)[0];
+    const fast = computeReadout({ vramGB: 24, bandwidthGBs: 1008 }, 8e9)[0]!;
+    const slow = computeReadout({ vramGB: 24, bandwidthGBs: 360 }, 8e9)[0]!;
     expect(fast.tokensPerSecond).toBeGreaterThan(slow.tokensPerSecond);
   });
 
