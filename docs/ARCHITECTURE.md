@@ -56,8 +56,8 @@ npm run dev        # local dev server
 npm test           # vitest run (pure logic + jsdom UI)
 npm run coverage   # vitest run --coverage (V8)
 npm run typecheck  # tsc --noEmit
-npm run build      # tsc --noEmit && vite build -> dist/ (relative base, subpath-safe)
+npm run build      # tsc --noEmit && vite build -> site/ (relative base, subpath-safe)
 ```
 
-The build is base-path-relative (`vite.config.ts` `base: "./"`) so `dist/`
+The build is base-path-relative (`vite.config.ts` `base: "./"`) so `site/`
 serves correctly from a subpath like `apps.charliekrug.com/fit-check/`.

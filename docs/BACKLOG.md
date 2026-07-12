@@ -83,7 +83,7 @@ anything else.
   - A generated, non-default favicon using the accent color renders in the browser tab.
 
 - [x] **Verify static build is deployable to a subpath**
-  - `npm run build` outputs a self-contained `dist/` using only relative asset paths (no leading
+  - `npm run build` outputs a self-contained `site/` using only relative asset paths (no leading
     `/`).
-  - Serving `dist/` under a subpath (e.g. `/fit-check/`) loads all assets and the app functions
+  - Serving `site/` under a subpath (e.g. `/fit-check/`) loads all assets and the app functions
     correctly.
