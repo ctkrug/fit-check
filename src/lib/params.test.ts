@@ -23,6 +23,18 @@ describe("parseParamCount", () => {
     expect(parseParamCount("1e999B")).toBeNull();
   });
 
+  it("tolerates surrounding whitespace and mixed case", () => {
+    expect(parseParamCount("  7b  ")).toBe(7_000_000_000);
+    expect(parseParamCount("1.5B")).toBe(1_500_000_000);
+  });
+
+  it("rejects unit-only, sign, and unicode noise", () => {
+    expect(parseParamCount("B")).toBeNull();
+    expect(parseParamCount("+7B")).toBeNull();
+    expect(parseParamCount("7️⃣B")).toBeNull();
+    expect(parseParamCount("7BB")).toBeNull();
+  });
+
   it("returns null for empty or malformed input", () => {
     expect(parseParamCount("")).toBeNull();
     expect(parseParamCount("   ")).toBeNull();
