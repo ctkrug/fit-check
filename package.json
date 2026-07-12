@@ -29,9 +29,12 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.10",
+    "fast-check": "^4.9.0",
     "jsdom": "^29.1.1",
     "typescript": "^5.9.3",
     "vite": "^8.1.4",
