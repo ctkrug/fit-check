@@ -532,6 +532,25 @@ input:focus-visible {
   }
 }
 
+/* Touch devices: meet the 44px minimum tap target without bloating the
+   compact drafting look on precise (mouse) pointers. */
+@media (pointer: coarse) {
+  .ghost,
+  .segmented button,
+  input[type="text"],
+  input[type="number"] {
+    min-height: 44px;
+  }
+  .bar-expand {
+    width: 44px;
+    height: 44px;
+  }
+  .combo-list li {
+    min-height: 44px;
+    align-items: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
