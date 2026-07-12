@@ -59,6 +59,14 @@ describe("createApp — live readout", () => {
     expect(root.querySelector(".bar")).toBeNull();
   });
 
+  it("prompts to pick a GPU before computing when none is selected", () => {
+    const root = mount({ initialSearch: "" });
+    type(root.querySelector("#model-input")!, "8B");
+    // No GPU picked: must not invent a phantom "Custom" card and compute bars.
+    expect(root.querySelector(".bar")).toBeNull();
+    expect(root.querySelector(".empty")?.textContent).toContain("Pick a GPU");
+  });
+
   it("marks FP16 of a 13B model as won't-fit on a 24GB card", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090" });
     type(root.querySelector("#model-input")!, "13B");

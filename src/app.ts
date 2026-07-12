@@ -68,8 +68,8 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
   const state: State = {
     gpu: null,
     custom: false,
-    vramGB: 24,
-    bandwidthGBs: 1008,
+    vramGB: 0,
+    bandwidthGBs: 0,
     modelInput: "",
     paramCount: null,
     format: "GGUF",
@@ -140,6 +140,10 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
     customToggle.setAttribute("aria-pressed", String(state.custom));
     if (state.custom) {
       state.gpu = null;
+      // Seed common values so custom entry starts from a usable point rather
+      // than empty/zero fields the user has to fill from scratch.
+      if (state.vramGB <= 0) state.vramGB = 24;
+      if (state.bandwidthGBs <= 0) state.bandwidthGBs = 1008;
       vramInput.value = String(state.vramGB);
       bwInput.value = String(state.bandwidthGBs);
       vramInput.focus();
