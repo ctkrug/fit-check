@@ -288,6 +288,27 @@ describe("createApp — breakdown and URL", () => {
     expect(root.querySelector(".breakdown")?.textContent).toContain("Footprint");
   });
 
+  it("destroy() clears a pending lookup timer and empties the root", () => {
+    const cleared: unknown[] = [];
+    const clearTimeoutImpl = ((id: unknown) => cleared.push(id)) as typeof clearTimeout;
+    // A real (deferred) timer so a lookup stays pending until destroy.
+    const deferred = ((_fn: () => void) => 42 as unknown as ReturnType<typeof setTimeout>) as typeof setTimeout;
+    const fetchImpl = vi.fn().mockReturnValue(new Promise<Response>(() => {}));
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    const h = createApp(root, {
+      reducedMotion: true,
+      setTimeoutImpl: deferred,
+      clearTimeoutImpl,
+      initialSearch: "?gpu=RTX+4090",
+      fetchImpl,
+    });
+    type(root.querySelector("#model-input")!, "meta-llama/Llama-3.1-8B");
+    h.destroy();
+    expect(cleared).toContain(42);
+    expect(root.innerHTML).toBe("");
+  });
+
   it("hydrates GPU, model, and format from the URL", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090&params=7B&fmt=AWQ" });
     expect(root.querySelector<HTMLInputElement>("#gpu-input")!.value).toBe("RTX 4090");
