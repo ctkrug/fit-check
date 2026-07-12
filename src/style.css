@@ -115,6 +115,37 @@ body {
   flex-direction: column;
   gap: 8px;
 }
+.masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.gh-link {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-input);
+  transition:
+    color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    background 150ms var(--ease);
+}
+.gh-link:hover {
+  color: var(--accent);
+  border-color: var(--line-strong);
+  background: rgba(79, 214, 255, 0.1);
+}
+.gh-link:focus-visible {
+  outline: none;
+  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 214, 255, 0.2);
+}
 .wordmark {
   display: flex;
   align-items: center;

@@ -502,8 +502,12 @@ function template(): string {
     <div class="corner tl"></div><div class="corner tr"></div>
     <div class="corner bl"></div><div class="corner br"></div>
     <header class="masthead">
-      <h1 class="wordmark"><span class="wordmark-text">FIT CHECK</span><span class="caret"></span></h1>
-      <p class="tagline">Will your GPU run it — and how fast? Real quant math, no lookup table.</p>
+      <div class="masthead-top">
+        <h1 class="wordmark"><span class="wordmark-text">FIT CHECK</span><span class="caret"></span></h1>
+        <a class="gh-link" href="https://github.com/ctkrug/fit-check" target="_blank" rel="noopener"
+           aria-label="View Fit Check source on GitHub">GitHub ↗</a>
+      </div>
+      <p class="tagline">Will that LLM run on your GPU, and how fast? Real quant math, not a lookup table.</p>
     </header>
 
     <section class="controls" aria-label="Inputs">
