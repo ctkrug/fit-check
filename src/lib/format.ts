@@ -15,6 +15,7 @@ export function formatTokensPerSecond(tokensPerSecond: number): string {
 /** Human-readable parameter count, e.g. 7_000_000_000 -> "7.0B", 125e6 -> "125M". */
 export function formatParamCount(count: number): string {
   if (!Number.isFinite(count) || count <= 0) return "—";
+  if (count >= 1e12) return `${(count / 1e12).toFixed(count >= 1e14 ? 0 : 1)}T`;
   if (count >= 1e9) return `${(count / 1e9).toFixed(count >= 1e11 ? 0 : 1)}B`;
   if (count >= 1e6) return `${Math.round(count / 1e6)}M`;
   return `${Math.round(count / 1e3)}K`;

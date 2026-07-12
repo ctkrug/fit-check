@@ -42,6 +42,11 @@ describe("formatParamCount", () => {
     expect(formatParamCount(405_000_000_000)).toBe("405B");
   });
 
+  it("uses a T suffix past a trillion parameters", () => {
+    expect(formatParamCount(1_800_000_000_000)).toBe("1.8T");
+    expect(formatParamCount(1_000_000_000_000)).toBe("1.0T");
+  });
+
   it("formats thousands with a K suffix", () => {
     expect(formatParamCount(500_000)).toBe("500K");
   });
