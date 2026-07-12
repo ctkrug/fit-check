@@ -341,6 +341,16 @@ describe("createApp — breakdown and URL", () => {
     expect(root.innerHTML).toBe("");
   });
 
+  it("mirrors the current inputs into the browser URL", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090" });
+    type(root.querySelector("#model-input")!, "8B");
+    root.querySelector<HTMLButtonElement>('[data-format="AWQ"]')!.click();
+    const search = window.location.search;
+    expect(search).toContain("gpu=RTX+4090");
+    expect(search).toContain("params=8B");
+    expect(search).toContain("fmt=AWQ");
+  });
+
   it("collapses an expanded breakdown on a second click", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
     const expand = () => root.querySelector<HTMLButtonElement>('[data-expand="Q4"]')!;
