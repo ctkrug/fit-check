@@ -67,6 +67,20 @@ describe("createApp — live readout", () => {
     expect(root.querySelector(".empty")?.textContent).toContain("Pick a GPU");
   });
 
+  it("announces a concise readout summary via an sr-only live region", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090" });
+    const summary = root.querySelector("#readout-summary")!;
+    expect(summary.getAttribute("aria-live")).toBe("polite");
+    type(root.querySelector("#model-input")!, "8B");
+    const text = summary.textContent ?? "";
+    expect(text).toContain("RTX 4090");
+    expect(text).toContain("Q4");
+    expect(text).toContain("FP16");
+    // The visible readout region must NOT itself be a live region (avoids
+    // re-announcing all four rebuilt bars on every keystroke).
+    expect(root.querySelector("#readout")?.getAttribute("aria-live")).toBeNull();
+  });
+
   it("marks FP16 of a 13B model as won't-fit on a 24GB card", () => {
     const root = mount({ initialSearch: "?gpu=RTX+4090" });
     type(root.querySelector("#model-input")!, "13B");

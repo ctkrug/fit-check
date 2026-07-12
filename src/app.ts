@@ -94,6 +94,7 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
   const modelInput = root.querySelector<HTMLInputElement>("#model-input")!;
   const modelStatus = root.querySelector<HTMLElement>("#model-status")!;
   const readout = root.querySelector<HTMLElement>("#readout")!;
+  const readoutSummary = root.querySelector<HTMLElement>("#readout-summary")!;
   const shareBtn = root.querySelector<HTMLButtonElement>("#share")!;
   const formatBtns = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-format]"));
 
@@ -331,6 +332,9 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
     const gpuReady = state.vramGB > 0 && state.bandwidthGBs > 0;
     if (!gpuReady || state.paramCount === null) {
       readout.innerHTML = emptyState(!gpuReady, state.lookupStatus === "error");
+      readoutSummary.textContent = !gpuReady
+        ? "Pick a GPU to begin."
+        : "Enter a model to run the check.";
       return;
     }
 
@@ -340,6 +344,18 @@ export function createApp(root: HTMLElement, options: AppOptions = {}): AppHandl
       `<p class="readout-caption">${escapeHtml(gpuLabel())} · ` +
       `${escapeHtml(formatParamCount(state.paramCount))} params · ${state.format}</p>` +
       results.map((r) => barMarkup(r, gpu)).join("");
+    // A single concise announcement instead of re-reading four rebuilt bars
+    // on every keystroke (the full readout region is not itself a live region).
+    readoutSummary.textContent =
+      `${gpuLabel()}, ${formatParamCount(state.paramCount)} params, ${state.format}. ` +
+      results
+        .map(
+          (r) =>
+            `${r.quant} ${VERDICT_LABEL[r.reason]}` +
+            (r.fits ? ` at ${formatTokensPerSecond(r.tokensPerSecond)}` : ""),
+        )
+        .join("; ") +
+      ".";
   }
 
   function barMarkup(r: QuantResult, gpu: { vramGB: number; bandwidthGBs: number }): string {
@@ -522,7 +538,8 @@ function template(): string {
       </div>
     </section>
 
-    <section id="readout" class="readout" aria-label="Fit and speed readout" aria-live="polite"></section>
+    <section id="readout" class="readout" aria-label="Fit and speed readout"></section>
+    <p id="readout-summary" class="sr-only" role="status" aria-live="polite"></p>
   </div>`;
 }
 
