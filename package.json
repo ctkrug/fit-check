@@ -5,6 +5,15 @@
   "private": true,
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctkrug/fit-check.git"
+  },
+  "homepage": "https://github.com/ctkrug/fit-check#readme",
+  "bugs": {
+    "url": "https://github.com/ctkrug/fit-check/issues"
+  },
+  "keywords": ["llm", "gpu", "quantization", "gguf", "awq", "vram"],
   "engines": {
     "node": ">=22"
   },
