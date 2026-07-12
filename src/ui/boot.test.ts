@@ -34,6 +34,21 @@ describe("typeWordmark", () => {
     expect(el.textContent).toBe("FIT");
   });
 
+  it("honors the reduced-motion media query when the option is omitted", () => {
+    const el = document.createElement("h1");
+    const original = globalThis.matchMedia;
+    // Simulate a user who has "reduce motion" enabled at the OS level.
+    globalThis.matchMedia = ((q: string) =>
+      ({ matches: q.includes("reduce"), media: q }) as MediaQueryList) as typeof matchMedia;
+    try {
+      typeWordmark(el, "FIT CHECK");
+      expect(el.textContent).toBe("FIT CHECK");
+      expect(el.classList.contains("is-typing")).toBe(false);
+    } finally {
+      globalThis.matchMedia = original;
+    }
+  });
+
   it("cancel() finishes the text immediately", () => {
     const el = document.createElement("h1");
     const fakeSetInterval = (() =>
