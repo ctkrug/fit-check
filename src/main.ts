@@ -8,3 +8,5 @@ if (app) {
     </main>
   `;
 }
+
+export {};
