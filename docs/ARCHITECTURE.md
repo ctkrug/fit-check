@@ -39,7 +39,14 @@ optional client-side fetch of a Hugging Face `config.json`.
 | `src/lib/urlstate.ts` | Encode/decode shareable state ↔ URL query string |
 | `src/style.css` | Blueprint design system (see `docs/DESIGN.md`) |
 
-Every `*.ts` under `src/lib` and `src/ui` has a sibling `*.test.ts`.
+Every `*.ts` under `src/lib` and `src/ui` has a sibling `*.test.ts`, plus
+`src/lib/properties.test.ts` — fast-check property tests asserting engine
+invariants (footprint/speed monotonicity, verdict ordering, parse round-trips,
+no NaN leaks).
+
+The GPU input is a keyboard-operable WAI-ARIA combobox: Arrow keys move a
+highlighted option, Enter selects, Escape closes, and `aria-expanded` /
+`aria-activedescendant` track state — a pointer is never required.
 
 ## Run / test / build
 
@@ -47,6 +54,7 @@ Every `*.ts` under `src/lib` and `src/ui` has a sibling `*.test.ts`.
 npm install
 npm run dev        # local dev server
 npm test           # vitest run (pure logic + jsdom UI)
+npm run coverage   # vitest run --coverage (V8)
 npm run typecheck  # tsc --noEmit
 npm run build      # tsc --noEmit && vite build -> dist/ (relative base, subpath-safe)
 ```
