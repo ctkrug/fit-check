@@ -69,4 +69,22 @@ describe("lookupModel", () => {
     const result = await lookupModel("owner/weird-model", fetchImpl);
     expect(result).toEqual({ ok: false, error: "no-param-count" });
   });
+
+  it("maps unparseable JSON (HTML error page) to a network error", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => {
+        throw new SyntaxError("Unexpected token < in JSON");
+      },
+    } as unknown as Response);
+    const result = await lookupModel("owner/broken-json", fetchImpl);
+    expect(result).toEqual({ ok: false, error: "network" });
+  });
+
+  it("maps a 500 (non-404 !ok) to a network error", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(statusResponse(500));
+    const result = await lookupModel("owner/server-down", fetchImpl);
+    expect(result).toEqual({ ok: false, error: "network" });
+  });
 });

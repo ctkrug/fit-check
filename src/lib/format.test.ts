@@ -42,7 +42,12 @@ describe("formatParamCount", () => {
     expect(formatParamCount(405_000_000_000)).toBe("405B");
   });
 
-  it("renders a dash for non-positive counts", () => {
+  it("formats thousands with a K suffix", () => {
+    expect(formatParamCount(500_000)).toBe("500K");
+  });
+
+  it("renders a dash for non-positive or non-finite counts", () => {
     expect(formatParamCount(0)).toBe("—");
+    expect(formatParamCount(Number.NaN)).toBe("—");
   });
 });

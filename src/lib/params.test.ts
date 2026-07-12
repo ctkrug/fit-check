@@ -14,6 +14,15 @@ describe("parseParamCount", () => {
     expect(parseParamCount("8e9")).toBe(8_000_000_000);
   });
 
+  it("applies K and M suffixes", () => {
+    expect(parseParamCount("500k")).toBe(500_000);
+    expect(parseParamCount("125M")).toBe(125_000_000);
+  });
+
+  it("rejects a non-finite magnitude", () => {
+    expect(parseParamCount("1e999B")).toBeNull();
+  });
+
   it("returns null for empty or malformed input", () => {
     expect(parseParamCount("")).toBeNull();
     expect(parseParamCount("   ")).toBeNull();
@@ -49,6 +58,16 @@ describe("deriveParamCount", () => {
     const untied = deriveParamCount({ ...base, tie_word_embeddings: false })!;
     const tied = deriveParamCount({ ...base, tie_word_embeddings: true })!;
     expect(tied).toBeLessThan(untied);
+  });
+
+  it("derives a count even when head counts are absent (defaults applied)", () => {
+    const count = deriveParamCount({
+      hidden_size: 2048,
+      num_hidden_layers: 24,
+      intermediate_size: 5632,
+      vocab_size: 32000,
+    });
+    expect(count).toBeGreaterThan(0);
   });
 
   it("returns null when required dimensions are missing", () => {
