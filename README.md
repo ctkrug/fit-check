@@ -33,18 +33,22 @@ yellow (fits, usable but slow), or red (won't fit or unusably slow) — each ann
 estimated tokens/sec. No page reload, no waiting on a backend: it's all computed client-side the
 moment you stop typing.
 
-## Planned features
+## Features
 
-- GPU picker with a curated database of common consumer/prosumer cards (VRAM + bandwidth), plus
-  a manual-entry fallback for anything not listed.
-- Hugging Face model lookup by repo ID, pulling parameter count and architecture from the
-  public model config (no model weights downloaded).
-- GGUF and AWQ quantization memory-footprint formulas, covering Q4_0/Q4_K_M/Q5_K_M/Q8_0/FP16
-  and comparable AWQ bit-widths.
-- Memory-bandwidth-derived tokens/sec estimate per quant level, with a visible "how this is
-  calculated" breakdown so the numbers aren't a black box.
-- Instant, reload-free UI: type a GPU and a model, see every quant bar update live.
-- Shareable results via URL so a specific GPU/model combo can be linked directly.
+- **GPU picker** with a curated catalogue of 21 consumer, datacenter, AMD, and Apple parts
+  (VRAM + memory bandwidth from vendor specs), type-to-filter search, plus a **custom-entry**
+  fallback for anything not listed.
+- **Hugging Face model lookup** by repo ID — fetches only the public `config.json` client-side
+  (no weights) and derives the parameter count, falling back to an architecture formula
+  (GQA-aware attention + gated MLP + tied/untied embeddings) when no explicit count is present.
+- **GGUF and AWQ** memory-footprint math from effective bits-per-parameter constants calibrated
+  against real Llama-2-7B / Llama-3-8B file sizes (within ~2%), across Q4/Q5/Q8/FP16.
+- **Bandwidth-derived tokens/sec** per quant level with a calibrated efficiency factor, plus an
+  expandable **"how this is calculated"** breakdown so the numbers aren't a black box.
+- **Instant, reload-free UI:** the four quant bars recompute synchronously on every keystroke;
+  a manual size like `7B` needs no network at all.
+- **Shareable results via URL** — the GPU, model, and format round-trip through the query string
+  so a specific combo can be linked directly.
 
 ## Stack
 
@@ -54,7 +58,7 @@ covering the quantization and bandwidth math.
 
 ## Development
 
-Requires Node 22+ (see `.nvmrc`).
+Requires Node 20+ (see `.nvmrc`).
 
 ```
 npm install
@@ -66,8 +70,9 @@ npm run build      # type-check + production build into dist/
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design rationale,
-[`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction, and
+Core feature set is functionally complete end-to-end. See [`docs/VISION.md`](docs/VISION.md) for
+the design rationale, [`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction,
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the module map, and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
 
 ## License
