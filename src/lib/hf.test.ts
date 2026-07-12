@@ -26,6 +26,20 @@ describe("isValidRepoId", () => {
   });
 });
 
+describe("isValidRepoId — adversarial", () => {
+  it("accepts dotted/underscored segments and trims whitespace", () => {
+    expect(isValidRepoId("Org.ai/Model_v2.5")).toBe(true);
+    expect(isValidRepoId("  meta-llama/Llama-3.1-8B  ")).toBe(true);
+  });
+
+  it("rejects leading punctuation, spaces, and unicode", () => {
+    expect(isValidRepoId(".hidden/model")).toBe(false);
+    expect(isValidRepoId("owner /model")).toBe(false);
+    expect(isValidRepoId("café/modèle")).toBe(false);
+    expect(isValidRepoId("owner/")).toBe(false);
+  });
+});
+
 describe("configUrl", () => {
   it("points at the main-revision config.json on the HF CDN", () => {
     expect(configUrl("meta-llama/Llama-3.1-8B")).toBe(
