@@ -1,0 +1,12 @@
+/*
+ * Scaffold-only styling. Real tokens and layout land with docs/DESIGN.md
+ * and the BUILD-phase UI stories — this just proves the page renders.
+ */
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
