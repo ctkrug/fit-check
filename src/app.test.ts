@@ -149,6 +149,22 @@ describe("createApp — model input handling", () => {
     expect(msg).toContain("7B");
   });
 
+  it("returns to the empty state when the model input is cleared", () => {
+    const root = mount({ initialSearch: "?gpu=RTX+4090&params=8B" });
+    expect(root.querySelectorAll(".bar")).toHaveLength(4);
+    type(root.querySelector("#model-input")!, "");
+    expect(root.querySelector(".bar")).toBeNull();
+    expect(root.querySelector("#model-status")?.getAttribute("data-state")).toBe("idle");
+  });
+
+  it("flags a slash-bearing but invalid repo ID without fetching", () => {
+    const fetchImpl = vi.fn();
+    const root = mount({ initialSearch: "?gpu=RTX+4090", fetchImpl });
+    type(root.querySelector("#model-input")!, "-bad/repo!");
+    expect(root.querySelector("#model-status")?.textContent).toContain("valid repo ID");
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
   it("resolves a HF repo ID via the injected fetch", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
